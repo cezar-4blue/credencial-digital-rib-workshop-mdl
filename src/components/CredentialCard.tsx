@@ -7,11 +7,10 @@ import { LogoWorkshop } from "../assets/LogoWorkshop";
 interface Props {
   nome: string;
   empresa?: string;
-  fotoUrl?: string;
   onBackToForm?: () => void;
 }
 
-export function CredentialCard({ nome, empresa, fotoUrl, onBackToForm }: Props) {
+export function CredentialCard({ nome, empresa, onBackToForm }: Props) {
   const cardRef = useRef<HTMLDivElement>(null);
 
   const kebabCaseName = nome.trim().toLowerCase()
@@ -57,24 +56,15 @@ export function CredentialCard({ nome, empresa, fotoUrl, onBackToForm }: Props) 
           <span className="text-[11px] tracking-widest font-mono bg-black/20 px-2.5 py-0.5 rounded-md text-black font-extrabold">15 & 16 SET</span>
         </div>
 
-        <div className="w-full flex flex-col items-center z-10 my-3">
-          {fotoUrl ? (
-            <div className="relative mb-3">
-              <div className="w-28 h-28 rounded-2xl border-2 border-[#FFD700]/80 p-1.5 bg-black/90 shadow-2xl relative overflow-hidden">
-                <img src={fotoUrl} alt={nome} className="w-full h-full rounded-xl object-cover" />
-              </div>
-              <div className="absolute -bottom-1.5 -right-1.5 bg-[#FFD700] text-black p-1.5 rounded-full shadow-lg border border-black">
-                <ShieldCheck className="w-4 h-4" />
-              </div>
-            </div>
-          ) : (
-            <div className="w-20 h-20 rounded-2xl border-2 border-[#FFD700]/60 bg-gradient-to-br from-primary/20 to-black flex items-center justify-center mb-3 text-[#FFD700] font-heading font-black text-3xl shadow-xl">
-              {nome.charAt(0).toUpperCase()}
-            </div>
-          )}
+        <div className="w-full flex flex-col items-center z-10 my-4">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-[#FFD700]/30 mb-2.5">
+            <ShieldCheck className="w-3.5 h-3.5 text-[#FFD700]" />
+            <span className="text-[10px] tracking-[0.25em] uppercase text-[#FFD700] font-bold">PARTICIPANTE CONFIRMADO</span>
+          </div>
 
-          <span className="text-[10px] tracking-[0.35em] uppercase text-muted-foreground/80 font-bold mb-1">PARTICIPANTE CONFIRMADO</span>
-          <h2 className="font-heading text-2xl font-black uppercase tracking-tight text-center z-10 text-[#FFD700] drop-shadow-[0_2px_10px_rgba(255,215,0,0.4)] px-2 leading-tight">{nome}</h2>
+          <h2 className="font-heading text-2xl sm:text-3xl font-black uppercase tracking-tight text-center z-10 text-[#FFD700] drop-shadow-[0_2px_10px_rgba(255,215,0,0.4)] px-2 leading-tight">
+            {nome}
+          </h2>
 
           {empresa && (
             <div className="mt-2 flex items-center gap-1.5 bg-primary/10 px-4 py-1 rounded-full border border-primary/30 text-center max-w-[92%]">
