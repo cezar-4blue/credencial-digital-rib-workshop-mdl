@@ -1,11 +1,11 @@
-import { useState, useRef, ChangeEvent } from "react";
+import { useState } from "react";
 import { z } from "zod";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, User, Camera, Sparkles, Building2 } from "lucide-react";
+import { Loader2, Building2 } from "lucide-react";
 import { toast } from "sonner";
 
 const schema = z.object({
@@ -20,7 +20,6 @@ const schema = z.object({
     .min(8, "Número de WhatsApp inválido")
     .regex(/^[\d\s-()]+$/, "Apenas números, espaços, parênteses e traços permitidos"),
   empresa: z.string().max(80, "Nome da empresa muito longo").optional(),
-  fotoUrl: z.string().optional(),
 });
 
 export type CredentialFormData = z.infer<typeof schema>;
@@ -38,10 +37,8 @@ interface Props {
 
 export function CredentialForm({ onSuccess, utmParams }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const { register, handleSubmit, control, watch, setValue, formState: { errors } } = useForm<CredentialFormData>({
+  const { register, handleSubmit, control, watch, formState: { errors } } = useForm<CredentialFormData>({
     resolver: zodResolver(schema),
     defaultValues: {
       ddd: "+55",
@@ -49,37 +46,10 @@ export function CredentialForm({ onSuccess, utmParams }: Props) {
       nomeCompleto: "",
       email: "",
       empresa: "",
-      fotoUrl: ""
     }
   });
 
   const selectedDdd = watch("ddd");
-
-  const handlePhotoUpload = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error("Imagem muito grande. Escolha uma de até 5MB.");
-        return;
-      }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result as string;
-        setPhotoPreview(result);
-        setValue("fotoUrl", result);
-        toast.success("Foto carregada para a credencial!");
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const removePhoto = () => {
-    setPhotoPreview(null);
-    setValue("fotoUrl", "");
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
   
   const getPlaceholder = (ddd: string) => {
     switch(ddd) {
@@ -99,7 +69,7 @@ export function CredentialForm({ onSuccess, utmParams }: Props) {
         email: data.email,
         whatsapp: `${data.ddd} ${data.whatsapp}`,
         empresa: data.empresa || "",
-        temFoto: !!data.fotoUrl,
+        temFoto: false,
         timestamp: new Date().toISOString(),
         utm_source: utmParams?.utm_source || "",
         utm_medium: utmParams?.utm_medium || "",
@@ -129,56 +99,6 @@ export function CredentialForm({ onSuccess, utmParams }: Props) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 w-full fade-in-up">
-      {/* Photo Upload Section */}
-      <div className="flex flex-col items-center justify-center p-4 rounded-xl border border-primary/30 bg-secondary/40 backdrop-blur-sm gap-3">
-        <div className="text-center">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-primary flex items-center justify-center gap-1">
-            <Sparkles className="w-3 h-3" /> Foto da Credencial Digital (Opcional)
-          </span>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Adicione sua foto para personalizar sua Credencial Digital dos 2 dias de imersão em Ribeirão Preto
-          </p>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <div className="relative w-16 h-16 rounded-full border-2 border-primary/60 overflow-hidden bg-black/60 flex items-center justify-center group shadow-md">
-            {photoPreview ? (
-              <img src={photoPreview} alt="Foto da Credencial Digital" className="w-full h-full object-cover" />
-            ) : (
-              <User className="w-8 h-8 text-muted-foreground/60" />
-            )}
-            <input 
-              type="file" 
-              ref={fileInputRef}
-              onChange={handlePhotoUpload}
-              accept="image/*"
-              className="hidden"
-            />
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="text-xs bg-primary/20 hover:bg-primary/30 text-primary border border-primary/40 px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
-            >
-              <Camera className="w-3.5 h-3.5" />
-              {photoPreview ? "Trocar foto" : "Carregar foto"}
-            </button>
-
-            {photoPreview && (
-              <button
-                type="button"
-                onClick={removePhoto}
-                className="text-[11px] text-destructive hover:underline text-left cursor-pointer"
-              >
-                Remover foto
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-
       <div className="space-y-2 text-left">
         <Label htmlFor="nomeCompleto" className="text-xs uppercase tracking-widest text-muted-foreground font-semibold">Nome Completo *</Label>
         <Input 
@@ -264,5 +184,7 @@ export function CredentialForm({ onSuccess, utmParams }: Props) {
     </form>
   );
 }
+
+
 
 
