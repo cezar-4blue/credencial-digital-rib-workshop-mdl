@@ -61,7 +61,6 @@ export default function App() {
             <CredentialCard
               nome={formData.nomeCompleto}
               empresa={formData.empresa}
-              fotoUrl={formData.fotoUrl}
               onBackToForm={() => setFormData(null)}
             />
           </div>
